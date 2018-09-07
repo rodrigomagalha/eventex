@@ -13,11 +13,15 @@ class SubscriptionForm(forms.Form):
     """Baby setps muito longo, como fazer mais curto"""
     name = forms.CharField(label='Nome')
     cpf = forms.CharField(label='CPF', validators=[validate_cpf])
-    email = forms.EmailField(label='E-Mail')
-    phone = forms.CharField(label='Telefone')
+    email = forms.EmailField(label='E-Mail', required=False)
+    phone = forms.CharField(label='Telefone', required=False)
 
     def clean_name(self):
-        name = self.cleaned_data['name']
+        name = self.cleaned_data.get('name')
         words = [w.capitalize() for w in name.split()]
 
         return ' '.join(words)
+
+    def clean(self):
+        if not self.cleaned_data.get('email') and not self.cleaned_data.get('phone'):
+            raise ValidationError('Informe seu e-mail ou telefone')
